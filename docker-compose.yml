@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:9.0
+    container_name: hotelapp-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hotel_app
+      MYSQL_USER: hotelapp
+      MYSQL_PASSWORD: hotelapp123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hotelapp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hotelapp-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=hotel_app;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5050:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - hotelapp-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  hotelapp-network:
+    driver: bridge
+
