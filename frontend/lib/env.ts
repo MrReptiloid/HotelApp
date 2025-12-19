@@ -10,7 +10,7 @@ function getEnvVar(key: string, defaultValue?: string): string {
 }
 
 export const env = {
-  apiUrl: getEnvVar('NEXT_PUBLIC_API_URL', 'http://localhost:5050'),
+  apiUrl: getEnvVar('NEXT_PUBLIC_API_URL', 'https://hotel-back.spectralv0id.com'),
 } as const;
 
 if (typeof window === 'undefined') {
